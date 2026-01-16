@@ -12,7 +12,16 @@ jobs:
     steps:
       - checkout
       - run: echo "This is a test step"
+  odc-backend:
+    machine: true
+    steps:
+      - checkout
 
+      - run: chmod +x ./run-depcheck.sh && ./run-depcheck.sh
+
+      - store_artifacts:
+          path: reports/dependency-check-report.json
+          destination: depcheck-artifact
   integration:
     docker:
       - image: cimg/base:stable
@@ -28,14 +37,16 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - run: echo "This is a deploy step"
-
-workflows:
-  version: 2
-  django:
-    jobs:
-      - build
-      - test
-      - integration
-      - prod:
-          type: approval
+      - run: echo "This is a deploy step¨
+  workflows:
+    version: 2
+    django:
+      jobs:
+        - build
+        - test
+        - odc-backend:
+            requires:
+              - test
+        - integration
+        - prod:
+            type: approval
